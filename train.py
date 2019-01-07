@@ -168,17 +168,18 @@ for epoch in range(10):
 
     net.eval()
     sum_acc = 0.0
-    for i,data in enumerate(testloader,0):
-        inputs,labels=data
-        if use_gpu:
-            inputs = inputs.cuda()
-            labels = labels.cuda()
-        inputs,labels=Variable(inputs),Variable(labels)
-        outputs=net(inputs)
-        optimizer.zero_grad()
-        ma,ind = t.max(outputs,1)
-        acc = t.sum(t.eq(ind,labels)).cpu().numpy()
-        sum_acc += 1.0 * acc / outputs.size(0)
+    with t.no_grad():
+        for i,data in enumerate(testloader,0):
+            inputs,labels=data
+            if use_gpu:
+                inputs = inputs.cuda()
+                labels = labels.cuda()
+            inputs,labels=Variable(inputs),Variable(labels)
+            outputs=net(inputs)
+            optimizer.zero_grad()
+            ma,ind = t.max(outputs,1)
+            acc = t.sum(t.eq(ind,labels)).cpu().numpy()
+            sum_acc += 1.0 * acc / outputs.size(0)
     print('test acc:' + str(sum_acc)+ '%')
 print('finished training')
 end_time = time.time()
